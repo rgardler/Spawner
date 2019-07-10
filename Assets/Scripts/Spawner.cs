@@ -10,9 +10,8 @@ namespace WizardsCode.Spawner
     {
         public enum Pattern { RandomWithinRadius, Grid }
 
-        [Header("Objects")]
-        [Tooltip("The prefabs to spawn. One will be selected at random at each spawn location.")]
-        public GameObject[] PrefabsToSpawn;
+        [Tooltip("The prefabs to spawn. One will be selected at random, based on the settings in the SpawnableObject.")]
+        public SpawnableObject[] SpawnableObjects;
 
         [Header("Spawn Characteristics")]
         [Tooltip("The pattern used to spawn objects")]
@@ -20,13 +19,6 @@ namespace WizardsCode.Spawner
 
         [Tooltip("The number of this object to spawn.")]
         public int Quantity = 1;
-
-        [Header("Common Settings")]
-        [Tooltip("The Y axies offset to use when deciding the spawn location. This will be aded to the Y spwarn coordinate.")]
-        public float yOffset = 0;
-
-        [Tooltip("Randomize the rotation or keep all spawned units uniform.")]
-        public bool IsRandomRotation = true;
 
         [Header("Grid Settings")]
         [Tooltip("Spacing between spawn points of objects in the grid.")]
@@ -40,6 +32,8 @@ namespace WizardsCode.Spawner
 
         List<GameObject> m_spawnedObjects = new List<GameObject>();
 
+        int m_totalWeight = 0;
+
         void Start()
         {
             Spawn();
@@ -47,6 +41,12 @@ namespace WizardsCode.Spawner
 
         public void Spawn()
         {
+            m_totalWeight = 0;
+            for (int i = 0; i < SpawnableObjects.Length; i++)
+            {
+                m_totalWeight += SpawnableObjects[i].weight;
+            }
+
             switch (SpawnPattern)
             {
                 case Pattern.RandomWithinRadius:
@@ -141,20 +141,39 @@ namespace WizardsCode.Spawner
         /// <param name="pos"></param>
         private void SpawnAt(Vector3 pos)
         {
-            Quaternion rotation;
-            if (IsRandomRotation)
+            // Select the object to spawn
+            int weight = 0;
+            int itemWeight = Random.Range(1, m_totalWeight);
+            int idx;
+            for (idx = 0; idx < SpawnableObjects.Length; idx++)
             {
-                rotation = Quaternion.Euler(0, Random.Range(0,360), 0);
-            } else
+                weight += SpawnableObjects[idx].weight;
+                if (itemWeight <= weight)
+                {
+                    break;
+                } 
+            }
+
+            // Calculate Rotation
+            Quaternion rotation;
+            if (SpawnableObjects[idx].IsRandomRotation)
+            {
+                rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            }
+            else
             {
                 rotation = Quaternion.identity;
             }
 
-            pos.y += yOffset;
+            // Calculate position
+            pos.y += SpawnableObjects[idx].yOffset;
 
-            int idx = Random.Range(0, PrefabsToSpawn.Length);
-            GameObject go = Instantiate(PrefabsToSpawn[idx], pos, rotation);
+            // Spawn object
+            GameObject go = Instantiate(SpawnableObjects[idx].Prefab);
+            go.transform.localRotation = rotation;
+            go.transform.position = pos;
             go.transform.SetParent(transform);
+
             m_spawnedObjects.Add(go);
         }
 

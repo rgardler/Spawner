@@ -9,7 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -204880839, guid: 4cd9652fe3bf4c544863d07774f64cb2, type: 3}
-  m_Name: Tasks
+  m_Script: {fileID: 11500000, guid: 555674f5231490d4bb552461b8c3bb10, type: 3}
+  m_Name: TreeHouse
   m_EditorClassIdentifier: 
-  _all: []
+  Prefab: {fileID: 5504721955301979629, guid: 5531d99443417de40b83d479413a9925, type: 3}
+  weight: 50
+  MaximumNumber: 1

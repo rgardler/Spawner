@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -204880839, guid: 4cd9652fe3bf4c544863d07774f64cb2, type: 3}
-  m_Name: Tasks
+  m_Script: {fileID: 11500000, guid: 555674f5231490d4bb552461b8c3bb10, type: 3}
+  m_Name: Sphere
   m_EditorClassIdentifier: 
-  _all: []
+  Prefab: {fileID: 4835695100075088078, guid: f67546cf8ba1c8e46bd0502d4c0c3e8d, type: 3}
+  weight: 50
+  yOffset: 0.5
+  IsRandomRotation: 1
