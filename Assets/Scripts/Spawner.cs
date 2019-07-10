@@ -1,43 +1,172 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class Spawner : MonoBehaviour
+namespace WizardsCode.Spawner
 {
-    [Header("Objects")]
-    [Tooltip("The prefab to spawn.")]
-    public GameObject Prefab;
-    [Tooltip("The number of this object to spawn.")]
-    public int Quantity = 1;
-    [Tooltip("Minimum spacing between objects spawned.")]
-    public float spacing = 1;
-
-    [Header("Location")]
-    [Tooltip("The spawn location.")]
-    public Vector3 Position = Vector3.zero;
-    [Tooltip("The radius of the circle within which this spawner will create objects. Set to 0 to spawn only on the position above.")]
-    public float Radius = 0;
-    [Tooltip("The Y axies offset to use when deciding the spawn location. This will be aded to the Y spwarn coordinate.")]
-    public float yOffset = 0;
-    
-    void Start()
+    public class Spawner : MonoBehaviour
     {
-        Spawn();
-    }
+        public enum Pattern { RandomWithinRadius, Grid }
 
-    public void Spawn()
-    {
-        Quaternion rotation = new Quaternion();
-        for (int i = 0; i < Quantity; i++)
+        [Header("Objects")]
+        [Tooltip("The prefabs to spawn. One will be selected at random at each spawn location.")]
+        public GameObject[] PrefabsToSpawn;
+
+        [Header("Spawn Characteristics")]
+        [Tooltip("The pattern used to spawn objects")]
+        public Pattern SpawnPattern;
+
+        [Tooltip("The number of this object to spawn.")]
+        public int Quantity = 1;
+
+        [Header("Common Settings")]
+        [Tooltip("The Y axies offset to use when deciding the spawn location. This will be aded to the Y spwarn coordinate.")]
+        public float yOffset = 0;
+
+        [Tooltip("Randomize the rotation or keep all spawned units uniform.")]
+        public bool IsRandomRotation = true;
+
+        [Header("Grid Settings")]
+        [Tooltip("Spacing between spawn points of objects in the grid.")]
+        public float GridSpacing = 1;
+        [Tooltip("Row length. Only used for Grid based systems.")]
+        public int RowLength = 5;
+
+        [Header("Radius Settings")]
+        [Tooltip("The radius of the circle within which this spawner will create objects. Set to 0 to spawn only on the position above.")]
+        public float Radius = 0;
+
+        List<GameObject> m_spawnedObjects = new List<GameObject>();
+
+        void Start()
         {
-            if (Radius > 0)
+            Spawn();
+        }
+
+        public void Spawn()
+        {
+            switch (SpawnPattern)
             {
-                Vector2 circlePos = Random.insideUnitCircle * Radius;
-                Position.x += circlePos.x;
-                Position.z += circlePos.y;
+                case Pattern.RandomWithinRadius:
+                    RandomWithinRadius();
+                    break;
+                case Pattern.Grid:
+                    Grid();
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
-            Position.y += yOffset;
-            Instantiate(Prefab, Position, rotation);
+        }
+
+        private void Grid()
+        {
+            int numOfCompleteRows = (Quantity / RowLength);
+            int numOfColumns;
+            if (numOfCompleteRows > 0)
+            {
+                numOfColumns = (Quantity / (numOfCompleteRows * RowLength));
+            }
+            else
+            {
+                numOfColumns = 1;
+            }
+            int lastRowCount = Quantity - ((numOfCompleteRows * RowLength) * numOfColumns);
+
+            float xCornerOffset;
+            if (lastRowCount > 0)
+            {
+                xCornerOffset = (numOfCompleteRows * GridSpacing) / 2;
+            } else
+            {
+                xCornerOffset = ((numOfCompleteRows - 1) * GridSpacing) / 2;
+            }
+            float zCornerOffset;
+            if (numOfCompleteRows == 0)
+            {
+                zCornerOffset = ((lastRowCount - 1) * GridSpacing) / 2;
+            }
+            else
+            {
+                zCornerOffset = ((RowLength - 1) * GridSpacing) / 2;
+            }
+
+            for (int i = 0; i < numOfColumns; i++)
+            {
+                for (int x = 0; x < numOfCompleteRows; x++)
+                {
+                    for (int z = 0; z < RowLength; z++)
+                    {
+                        Vector3 pos = transform.position;
+                        pos.x += (GridSpacing * x) - xCornerOffset;
+                        pos.z += (GridSpacing * z) - zCornerOffset;
+                        SpawnAt(pos);
+                    }
+                }
+            }
+
+            if (lastRowCount > 0)
+            {
+                for (int z = 0; z < lastRowCount; z ++)
+                {
+                    Vector3 pos = transform.position;
+                    pos.x += (GridSpacing * numOfCompleteRows) - xCornerOffset;
+                    pos.z += (GridSpacing * z) - zCornerOffset;
+                    SpawnAt(pos);
+
+                }
+            }
+        }
+
+
+        private void RandomWithinRadius()
+        {
+            for (int i = 0; i < Quantity; i++)
+            {
+                Vector3 pos = transform.position;
+                if (Radius > 0)
+                {
+                    Vector2 circlePos = Random.insideUnitCircle * Radius;
+                    pos.x += circlePos.x;
+                    pos.z += circlePos.y;
+                }
+                SpawnAt(pos);
+            }
+        }
+
+        /// <summary>
+        /// Spawn an object at the supplied position after applying any offset required.
+        /// </summary>
+        /// <param name="pos"></param>
+        private void SpawnAt(Vector3 pos)
+        {
+            Quaternion rotation;
+            if (IsRandomRotation)
+            {
+                rotation = Quaternion.Euler(0, Random.Range(0,360), 0);
+            } else
+            {
+                rotation = Quaternion.identity;
+            }
+
+            pos.y += yOffset;
+
+            int idx = Random.Range(0, PrefabsToSpawn.Length);
+            GameObject go = Instantiate(PrefabsToSpawn[idx], pos, rotation);
+            go.transform.SetParent(transform);
+            m_spawnedObjects.Add(go);
+        }
+
+        /// <summary>
+        /// Destroy all previously spawned objects.
+        /// </summary>
+        public void DestroyObjects()
+        {
+            for(int i = 0; i < m_spawnedObjects.Count; i++)
+            {
+                DestroyImmediate(m_spawnedObjects[i]);
+            }
         }
     }
 }

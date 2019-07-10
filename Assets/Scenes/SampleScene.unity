@@ -323,9 +323,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61fd838fc5662e14f85f94288b6bafce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 8884126217059608492, guid: 27bbaa5792054bf47ac2478580ab7edd, type: 3}
-  Quantity: 5
-  Position: {x: 0, y: 0, z: 0}
+  PrefabsToSpawn:
+  - {fileID: 5504721955301979629, guid: 5531d99443417de40b83d479413a9925, type: 3}
+  SpawnPattern: 1
+  Quantity: 10
+  yOffset: 0
+  IsRandomRotation: 1
+  GridSpacing: 80
+  RowLength: 5
   Radius: 10
 --- !u!4 &2107888731
 Transform:

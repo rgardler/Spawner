@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -2086225651, guid: 4cd9652fe3bf4c544863d07774f64cb2, type: 3}
+  m_Name: Boards
+  m_EditorClassIdentifier: 
+  _all:
+  - _id: c55ff6ac2bbc86e3399b270b3e1b86a6d8356812-48316eb3-5fe7-468e-9587-77679629fdaa
+    _name: Board
+    _groupIds:
+    - c55ff6ac2bbc86e3399b270b3e1b86a6d8356812-25e2a1aa-5fc1-4228-ab32-4e3c8632c6e7
+    - c55ff6ac2bbc86e3399b270b3e1b86a6d8356812-ce9a6d3d-dd2c-4c25-a0af-a2b80be479f3
+    - c55ff6ac2bbc86e3399b270b3e1b86a6d8356812-84d95455-c7b0-4647-a8a8-1c61a8d2e00e
+    - c55ff6ac2bbc86e3399b270b3e1b86a6d8356812-38b5ed64-c71a-4c9b-ae25-8c06da033d4e
+    _scrollPosition: {x: 0, y: 0}
+    _treeWindow_SearchShow: 1
+    treeWindowShowGroupsAnimation:
+      m_Target: 0
+      speed: 2
+      m_Value: 0
+    _treeWindow_ShowGroups: 0
